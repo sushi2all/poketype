@@ -19,9 +19,8 @@ const iconSrc = computed(() => `/types/${props.type}.png`)
   <img 
     :src="iconSrc"
     :alt="`${type} type icon`"
-    :width="size"
-    :height="size"
     class="flex-shrink-0 rounded-full"
+    :style="{ width: `${size}px`, height: `${size}px` }"
     loading="lazy"
   />
 </template>

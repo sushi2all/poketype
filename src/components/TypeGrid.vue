@@ -83,17 +83,17 @@ const hasSelection = computed(() => props.primaryType !== null)
     </div>
 
     <!-- Type Grid - Compact -->
-    <div class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-18 gap-1.5 sm:gap-2 max-w-4xl mx-auto">
+    <div class="grid grid-cols-6 sm:grid-cols-9 gap-1.5 sm:gap-2 max-w-3xl mx-auto">
       <button
         v-for="type in allTypes"
         :key="type"
         @click="handleTypeClick(type)"
-        class="relative flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-lg transition-all duration-150 bg-white/5 border border-white/10"
+        class="relative flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg transition-all duration-150 bg-white/5 border border-white/10"
         :class="getButtonClasses(type)"
         :aria-pressed="primaryType === type || secondaryType === type"
         :aria-label="`${formatTypeName(type)} type`"
       >
-        <TypeIcon :type="type" :size="32" class="sm:w-10 sm:h-10" />
+        <TypeIcon :type="type" :size="40" />
         <span class="text-[10px] sm:text-xs text-gray-400 mt-0.5 font-medium">{{ formatTypeName(type) }}</span>
         
         <!-- Selection indicator -->
