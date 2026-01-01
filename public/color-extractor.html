@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Color Extractor</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        pre { background: #f5f5f5; padding: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Extracting colors from type icons...</h1>
+    <pre id="output">Loading...</pre>
+    
+    <script>
+        const types = ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fighting', 
+                      'fire', 'flying', 'ghost', 'grass', 'ground', 'ice', 
+                      'normal', 'poison', 'psychic', 'rock', 'steel', 'water'];
+        
+        const colors = {};
+        let loaded = 0;
+        
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            }).join("").toUpperCase();
+        }
+        
+        function getDominantColor(img) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width || img.naturalWidth;
+            canvas.height = img.height || img.naturalHeight;
+            ctx.drawImage(img, 0, 0);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            let r = 0, g = 0, b = 0, count = 0;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i + 3] > 0) { // Skip transparent pixels
+                    r += data[i];
+                    g += data[i + 1];
+                    b += data[i + 2];
+                    count++;
+                }
+            }
+            
+            r = Math.round(r / count);
+            g = Math.round(g / count);
+            b = Math.round(b / count);
+            
+            return rgbToHex(r, g, b);
+        }
+        
+        function processImage(type) {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                const color = getDominantColor(img);
+                colors[type] = color;
+                loaded++;
+                
+                const output = document.getElementById('output');
+                output.textContent = `Loaded ${loaded}/${types.length}...\n\n`;
+                
+                if (loaded === types.length) {
+                    let result = "export const typeColors = {\n";
+                    Object.keys(colors).sort().forEach(t => {
+                        result += `  ${t}: '${colors[t]}',\n`;
+                    });
+                    result += "};\n";
+                    output.textContent = result;
+                    console.log(result);
+                    console.table(colors);
+                }
+            };
+            img.onerror = function() {
+                console.error(`Failed to load ${type}`);
+                loaded++;
+                if (loaded === types.length) {
+                    const output = document.getElementById('output');
+                    let result = "export const typeColors = {\n";
+                    Object.keys(colors).sort().forEach(t => {
+                        result += `  ${t}: '${colors[t]}',\n`;
+                    });
+                    result += "};\n";
+                    output.textContent = result;
+                }
+            };
+            img.src = `/types/${type}.png`;
+        }
+        
+        // Start processing all images
+        types.forEach(type => processImage(type));
+    </script>
+</body>
+</html>
+
